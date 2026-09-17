@@ -1,0 +1,368 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ------------------------------------------------------------------
+   UniSense AI — bundled fonts (self-hosted, no CDN)
+   ------------------------------------------------------------------ */
+
+@font-face {
+  font-family: "Space Grotesk";
+  src: url("/assets/fonts/SpaceGrotesk.woff2") format("woff2");
+  font-weight: 300 700;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Figtree";
+  src: url("/assets/fonts/Figtree.woff2") format("woff2");
+  font-weight: 300 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist Mono";
+  src: url("/assets/fonts/GeistMono.woff2") format("woff2");
+  font-weight: 300 700;
+  font-display: swap;
+}
+
+@layer base {
+  :root {
+    /* Typography roles */
+    --font-display: "Space Grotesk";
+    --font-body: "Figtree";
+    --font-mono: "Geist Mono";
+
+    /* Shape language: soft, generous, friendly */
+    --radius: 1rem;
+
+    /* ---- Light: "Daylight Campus" ----
+       Cool off-white paper, deep ocean blue, one calm teal.
+       Hue family 258 (blue) / 232 (cool neutral) / 195 (teal). */
+    --background: 0.982 0.006 232;
+    --foreground: 0.205 0.022 258;
+    --card: 1 0 0;
+    --card-foreground: 0.205 0.022 258;
+    --popover: 1 0 0;
+    --popover-foreground: 0.205 0.022 258;
+
+    --primary: 0.485 0.192 258;
+    --primary-foreground: 0.985 0.004 258;
+
+    --secondary: 0.952 0.014 248;
+    --secondary-foreground: 0.305 0.03 258;
+    --muted: 0.958 0.01 244;
+    --muted-foreground: 0.512 0.024 256;
+
+    --accent: 0.62 0.132 195;
+    --accent-foreground: 0.185 0.03 195;
+
+    --destructive: 0.552 0.212 25;
+    --destructive-foreground: 0.985 0.004 25;
+    --success: 0.585 0.148 158;
+    --success-foreground: 0.985 0.004 158;
+    --warning: 0.735 0.152 76;
+    --warning-foreground: 0.205 0.03 76;
+
+    --border: 0.912 0.012 248;
+    --input: 0.912 0.012 248;
+    --ring: 0.485 0.192 258;
+
+    /* ---- AI Scan: simulated camera stage ----
+       A deliberate "camera" surface that stays dark in BOTH modes, so the
+       viewfinder reads as an optical device rather than a page section.
+       Derived from the same 258 hue family as the rest of the system. */
+    --viewfinder: 0.238 0.032 258;
+    --viewfinder-foreground: 0.965 0.008 248;
+    --viewfinder-muted: 0.665 0.024 250;
+    --viewfinder-border: 0.365 0.034 258;
+    --viewfinder-bracket: 0.845 0.012 248;
+
+    --chart-1: 0.485 0.192 258;
+    --chart-2: 0.62 0.132 195;
+    --chart-3: 0.585 0.148 158;
+    --chart-4: 0.735 0.152 76;
+    --chart-5: 0.56 0.18 300;
+
+    --sidebar: 1 0 0;
+    --sidebar-foreground: 0.205 0.022 258;
+    --sidebar-primary: 0.485 0.192 258;
+    --sidebar-primary-foreground: 0.985 0.004 258;
+    --sidebar-accent: 0.958 0.01 244;
+    --sidebar-accent-foreground: 0.305 0.03 258;
+    --sidebar-border: 0.912 0.012 248;
+    --sidebar-ring: 0.485 0.192 258;
+
+    /* ---- Non-color tokens ---- */
+    --gradient-primary: linear-gradient(
+      135deg,
+      oklch(0.545 0.185 258) 0%,
+      oklch(0.455 0.198 268) 100%
+    );
+    --gradient-subtle: linear-gradient(
+      180deg,
+      oklch(0.985 0.012 248) 0%,
+      oklch(0.965 0.008 236) 100%
+    );
+    --gradient-sheen: linear-gradient(
+      180deg,
+      oklch(0.485 0.192 258 / 0.08) 0%,
+      oklch(0.485 0.192 258 / 0) 100%
+    );
+
+    --shadow-tint: 258 0.05;
+
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-snappy: all 0.18s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .dark {
+    /* ---- Dark: "Night Library" ----
+       Deep navy-charcoal, luminous blue, same calm teal. */
+    --background: 0.168 0.022 258;
+    --foreground: 0.945 0.008 248;
+    --card: 0.216 0.026 258;
+    --card-foreground: 0.945 0.008 248;
+    --popover: 0.238 0.028 258;
+    --popover-foreground: 0.945 0.008 248;
+
+    --primary: 0.712 0.148 252;
+    --primary-foreground: 0.168 0.022 258;
+
+    --secondary: 0.252 0.028 258;
+    --secondary-foreground: 0.9 0.012 248;
+    --muted: 0.252 0.028 258;
+    --muted-foreground: 0.652 0.022 250;
+
+    --accent: 0.735 0.118 195;
+    --accent-foreground: 0.168 0.022 195;
+
+    --destructive: 0.645 0.19 24;
+    --destructive-foreground: 0.168 0.022 24;
+    --success: 0.702 0.142 158;
+    --success-foreground: 0.168 0.022 158;
+    --warning: 0.792 0.148 80;
+    --warning-foreground: 0.168 0.022 80;
+
+    --border: 0.312 0.028 258;
+    --input: 0.312 0.028 258;
+    --ring: 0.712 0.148 252;
+
+    /* AI Scan stage — slightly deeper than light mode so the viewfinder
+       still separates from the Night Library background. */
+    --viewfinder: 0.148 0.026 258;
+    --viewfinder-foreground: 0.955 0.008 248;
+    --viewfinder-muted: 0.635 0.022 250;
+    --viewfinder-border: 0.335 0.032 258;
+    --viewfinder-bracket: 0.815 0.014 248;
+
+    --chart-1: 0.712 0.148 252;
+    --chart-2: 0.735 0.118 195;
+    --chart-3: 0.702 0.142 158;
+    --chart-4: 0.792 0.148 80;
+    --chart-5: 0.68 0.16 300;
+
+    --sidebar: 0.196 0.024 258;
+    --sidebar-foreground: 0.945 0.008 248;
+    --sidebar-primary: 0.712 0.148 252;
+    --sidebar-primary-foreground: 0.168 0.022 258;
+    --sidebar-accent: 0.252 0.028 258;
+    --sidebar-accent-foreground: 0.9 0.012 248;
+    --sidebar-border: 0.312 0.028 258;
+    --sidebar-ring: 0.712 0.148 252;
+
+    --gradient-primary: linear-gradient(
+      135deg,
+      oklch(0.735 0.142 252) 0%,
+      oklch(0.645 0.162 266) 100%
+    );
+    --gradient-subtle: linear-gradient(
+      180deg,
+      oklch(0.216 0.026 258) 0%,
+      oklch(0.188 0.022 252) 100%
+    );
+    --gradient-sheen: linear-gradient(
+      180deg,
+      oklch(0.712 0.148 252 / 0.12) 0%,
+      oklch(0.712 0.148 252 / 0) 100%
+    );
+
+    --shadow-tint: 258 0.06;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+    font-feature-settings: "cv11", "ss01";
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display tracking-tight;
+  }
+
+  /* Thai script needs a touch more line-height than Latin */
+  :lang(th) {
+    line-height: 1.65;
+  }
+
+  ::selection {
+    background: oklch(var(--primary) / 0.18);
+  }
+
+  /* Slim, unobtrusive scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: oklch(var(--border)) transparent;
+  }
+}
+
+@layer utilities {
+  .transition-smooth {
+    transition: var(--transition-smooth);
+  }
+
+  .transition-snappy {
+    transition: var(--transition-snappy);
+  }
+
+  /* ---- Surface / gradient helpers ---- */
+  .bg-gradient-primary {
+    background-image: var(--gradient-primary);
+  }
+
+  .bg-gradient-subtle {
+    background-image: var(--gradient-subtle);
+  }
+
+  .bg-gradient-sheen {
+    background-image: var(--gradient-sheen);
+  }
+
+  .text-gradient-primary {
+    background-image: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* ---- Depth ---- */
+  .shadow-soft {
+    box-shadow: 0 1px 2px oklch(var(--shadow-tint) / 0.06), 0 4px 12px -4px
+      oklch(var(--shadow-tint) / 0.1);
+  }
+
+  .shadow-elevated {
+    box-shadow: 0 1px 2px oklch(var(--shadow-tint) / 0.07), 0 12px 32px -10px
+      oklch(var(--shadow-tint) / 0.18);
+  }
+
+  .shadow-floating {
+    box-shadow: 0 2px 4px oklch(var(--shadow-tint) / 0.08), 0 20px 48px -16px
+      oklch(var(--shadow-tint) / 0.26);
+  }
+
+  /* ---- Signature: the "sense pulse" halo behind the AI affordance ---- */
+  .halo-primary {
+    box-shadow: 0 0 0 1px oklch(var(--primary) / 0.14), 0 0 0 8px
+      oklch(var(--primary) / 0.07), 0 0 0 18px oklch(var(--primary) / 0.035);
+  }
+
+  /* ---- Ambient atmosphere: soft blue light behind hero surfaces ---- */
+  .ambient-blue::before {
+    content: "";
+    position: absolute;
+    inset: -30% -10% auto -10%;
+    height: 70%;
+    background: radial-gradient(
+      60% 70% at 50% 0%,
+      oklch(var(--primary) / 0.16) 0%,
+      oklch(var(--primary) / 0) 100%
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ---- AI Scan: simulated viewfinder ----
+     The frame is four corner brackets (never a full border) so the stage
+     reads as an optical target, not a card. Brackets are drawn with
+     conic-gradient so no pseudo-element stacking or SVG is required. */
+  .viewfinder-stage {
+    background-color: oklch(var(--viewfinder));
+    background-image: radial-gradient(
+        120% 90% at 50% 0%,
+        oklch(var(--primary) / 0.22) 0%,
+        oklch(var(--primary) / 0) 62%
+      ),
+      radial-gradient(
+        90% 70% at 50% 110%,
+        oklch(var(--accent) / 0.14) 0%,
+        oklch(var(--accent) / 0) 60%
+      );
+    color: oklch(var(--viewfinder-foreground));
+  }
+
+  .viewfinder-frame {
+    background-image: conic-gradient(
+      from 0deg,
+      oklch(var(--viewfinder-bracket)) 0deg 90deg,
+      transparent 90deg 180deg,
+      oklch(var(--viewfinder-bracket)) 180deg 270deg,
+      transparent 270deg 360deg
+    );
+    -webkit-mask: linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    padding: 3px;
+  }
+
+  /* Corner-bracket frame that turns teal once a place is detected. */
+  .viewfinder-frame-detected {
+    background-image: conic-gradient(
+      from 0deg,
+      oklch(var(--accent)) 0deg 90deg,
+      transparent 90deg 180deg,
+      oklch(var(--accent)) 180deg 270deg,
+      transparent 270deg 360deg
+    );
+  }
+
+  /* ---- Mobile-safe bottom nav clearance ---- */
+  .pb-safe-nav {
+    padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* ---- Tabular numerals for countdowns and schedules ---- */
+  .nums-tabular {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum";
+  }
+}
+
+/* Respect reduced-motion for every decorative animation */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

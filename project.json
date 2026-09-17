@@ -1,0 +1,22 @@
+{
+  "overview": "UniSense AI is a Thai-language campus companion prototype that helps students scan building signs, find their next class, and navigate the campus.",
+  "features": [
+    "AI Scan button in the main menu and Home",
+    "Simulated building-sign scanning with AI analysis",
+    "Detected place details with building, floor, and room",
+    "One-tap route hand-off to the campus map",
+    "Next-class countdown and weekly schedule",
+    "AI campus assistant chat",
+    "EV shuttle lines with live countdown",
+    "Student profile and preferences"
+  ],
+  "category": "productivity",
+  "tags": [
+    "campus",
+    "navigation",
+    "thai",
+    "student",
+    "demo"
+  ],
+  "last_updated": "2026-09-17T21:23:36.001Z"
+}

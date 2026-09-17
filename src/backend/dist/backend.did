@@ -1,0 +1,202 @@
+type Value = 
+ variant {
+   "bool": bool;
+   float: float64;
+   "int": int;
+   "nat": nat;
+   "null";
+   "text": text;
+ };
+type UserRole = 
+ variant {
+   admin;
+   guest;
+   user;
+ };
+type StudentProfile = 
+ record {
+   avatarPlaceholder: text;
+   displayName: text;
+   faculty: text;
+   studentId: text;
+   year: nat;
+ };
+type SmartMoment = 
+ record {
+   arriveBeforeClass: bool;
+   buildingName: text;
+   destinationName: text;
+   estimatedArrival: ClockTime;
+   evMinutes: Minutes;
+   explanation: text;
+   finalWalkingMinutes: Minutes;
+   minutesRemaining: Minutes;
+   originName: text;
+   roomCode: text;
+   situation: SituationLevel;
+   situationMessage: text;
+   startTime: ClockTime;
+   subject: text;
+   totalMinutes: Minutes;
+   walkingMinutes: Minutes;
+ };
+type SituationLevel = 
+ variant {
+   A;
+   B;
+   C;
+ };
+type ScanResult = 
+ record {
+   buildingName: text;
+   floor: nat;
+   instruction: text;
+   roomCode: text;
+ };
+type RouteSegment = 
+ record {
+   distanceMetres: Metres;
+   fromLocationId: Id;
+   instruction: text;
+   toLocationId: Id;
+   walkingMinutes: Minutes;
+ };
+type RoutePlan = 
+ record {
+   arriveBeforeClass: bool;
+   destinationName: text;
+   estimatedArrival: ClockTime;
+   evMinutes: Minutes;
+   evSteps: vec text;
+   finalWalkingMinutes: Minutes;
+   originName: text;
+   totalMinutes: Minutes;
+   walkingMinutes: Minutes;
+   walkingSteps: vec text;
+ };
+type Room = 
+ record {
+   buildingId: Id;
+   buildingName: text;
+   code: text;
+   description: text;
+   floor: nat;
+   id: Id;
+ };
+type Result__1 = 
+ variant {
+   err: Error;
+   ok;
+ };
+type Result = 
+ record {
+   hasMore: bool;
+   rows: vec vec Cell;
+ };
+type NextClass = 
+ record {
+   buildingName: text;
+   endTime: ClockTime;
+   locationName: text;
+   minutesUntil: Minutes;
+   roomCode: text;
+   startTime: ClockTime;
+   subject: text;
+ };
+type Minutes = nat;
+type Metres = nat;
+type Id = nat;
+type EvLine = 
+ record {
+   arrivalMinutes: Minutes;
+   crowdLevel: text;
+   id: Id;
+   name: text;
+   nextStation: text;
+   stops: vec text;
+ };
+type Error = 
+ variant {
+   AmbiguousAttribute: record {
+                         field: text;
+                         sources: vec text;
+                       };
+   FrontendOriginMismatch: record {
+                             expected: vec text;
+                             got: text;
+                           };
+   FrontendOriginsNotConfigured;
+   MalformedCandid;
+   MissingField: text;
+   MixedSsoSources: record {
+                      otherKeys: vec text;
+                      ssoKeys: vec text;
+                    };
+   NoAttributes;
+   Stale: record {ageNs: nat;};
+   UnknownNonce;
+   UntrustedSsoSource: record {domain: text;};
+ };
+type DayOfWeek = text;
+type ClockTime = text;
+type ClassEntry = 
+ record {
+   buildingName: text;
+   day: DayOfWeek;
+   endTime: ClockTime;
+   id: Id;
+   instructor: text;
+   roomCode: text;
+   startTime: ClockTime;
+   subject: text;
+ };
+type Cell = 
+ record {
+   name: text;
+   value: Value;
+ };
+type CampusLocation = 
+ record {
+   description: text;
+   id: Id;
+   kind: text;
+   name: text;
+ };
+type Building = 
+ record {
+   code: text;
+   description: text;
+   floors: nat;
+   id: Id;
+   name: text;
+ };
+type AssistantAnswer = 
+ record {
+   answer: text;
+   intent: text;
+   route: opt RoutePlan;
+ };
+service : {
+  _initialize_access_control: () -> ();
+  _internet_identity_sign_in_finish: () -> (Result__1);
+  _internet_identity_sign_in_start: () -> (blob);
+  askCampus: (question: text) -> (AssistantAnswer) query;
+  assignCallerUserRole: (user: principal, role: UserRole) -> ();
+  execute: (qJson: text) -> (Result) query;
+  getApiDoc: () -> (text) query;
+  getCallerUserRole: () -> (UserRole) query;
+  getCurrentLocation: () -> (CampusLocation) query;
+  getNextClass: () -> (opt NextClass) query;
+  getProfile: () -> (StudentProfile) query;
+  getSmartMoment: () -> (opt SmartMoment) query;
+  isCallerAdmin: () -> (bool) query;
+  listBuildings: () -> (vec Building) query;
+  listEvLines: () -> (vec EvLine) query;
+  listLocations: () -> (vec CampusLocation) query;
+  listRooms: () -> (vec Room) query;
+  listRouteSegments: () -> (vec RouteSegment) query;
+  listSchedule: () -> (vec ClassEntry) query;
+  planRoute: (originName: text, destinationName: text) -> (RoutePlan) query;
+  scan: () -> (ScanResult);
+  schema: () -> (text) query;
+}
