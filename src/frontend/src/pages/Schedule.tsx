@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAppState } from "@/context/AppStateContext";
 import { useSchedule } from "@/hooks/useQueries";
+import { MOCK_CLASS_SCHEDULE } from "@/data/mockData";
 import {
   WEEK_ORDER,
   daySortIndex,
@@ -233,17 +234,15 @@ function WeekOverview({
               </span>
               <span className="flex flex-col items-center gap-1">
                 {entries.length > 0 ? (
-                  entries
-                    .slice(0, 3)
-                    .map((entry) => (
-                      <span
-                        key={entry.id.toString()}
-                        className={`h-1.5 w-1.5 rounded-full ${
-                          isToday ? "bg-primary" : "bg-primary/35"
-                        }`}
-                        aria-hidden="true"
-                      />
-                    ))
+                  entries.slice(0, 3).map((entry) => (
+                    <span
+                      key={entry.id.toString()}
+                      className={`h-1.5 w-1.5 rounded-full ${
+                        isToday ? "bg-primary" : "bg-primary/35"
+                      }`}
+                      aria-hidden="true"
+                    />
+                  ))
                 ) : (
                   <span
                     className="h-1.5 w-1.5 rounded-full bg-border"
@@ -253,9 +252,7 @@ function WeekOverview({
               </span>
               <span
                 className={`nums-tabular text-[10px] font-semibold ${
-                  entries.length > 0
-                    ? "text-foreground"
-                    : "text-muted-foreground"
+                  entries.length > 0 ? "text-foreground" : "text-muted-foreground"
                 }`}
               >
                 {entries.length > 0 ? `${entries.length} คลาส` : "ว่าง"}
@@ -292,6 +289,18 @@ export function Schedule() {
 
   const selectedEntries = byDay.get(selectedDay) ?? [];
   const isTodaySelected = selectedDay === todayName;
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const todayHasOnlyFinishedClasses =
+    isTodaySelected &&
+    selectedEntries.length > 0 &&
+    selectedEntries.every(
+      (entry) => (timeToMinutes(entry.endTime) ?? 0) <= currentMinutes,
+    );
+  const showMockClasses =
+    isTodaySelected && (selectedEntries.length === 0 || todayHasOnlyFinishedClasses);
+  const entriesToDisplay = showMockClasses
+    ? MOCK_CLASS_SCHEDULE
+    : selectedEntries;
   const totalClasses = schedule?.length ?? 0;
 
   return (
@@ -374,7 +383,7 @@ export function Schedule() {
               )}
             </div>
 
-            {selectedEntries.length === 0 ? (
+            {entriesToDisplay.length === 0 ? (
               <Card
                 data-ocid="schedule.empty_state"
                 className="rounded-2xl border-border bg-card p-8 text-center shadow-soft"
@@ -389,9 +398,7 @@ export function Schedule() {
                   วัน{selectedDay}ไม่มีคลาส
                 </h3>
                 <p className="mx-auto mt-1 max-w-xs text-sm text-muted-foreground">
-                  {isTodaySelected
-                    ? "วันนี้ว่างทั้งวัน ลองใช้เวลาอ่านหนังสือหรือพักผ่อนได้เลย"
-                    : "วันนี้ยังไม่มีคลาสในตาราง เลือกวันอื่นเพื่อดูตารางเรียนได้"}
+                  วันนี้ยังไม่มีคลาสในตาราง เลือกวันอื่นเพื่อดูตารางเรียนได้
                 </p>
                 {!isTodaySelected && (
                   <Button
@@ -407,9 +414,9 @@ export function Schedule() {
               </Card>
             ) : (
               <div className="space-y-3">
-                {selectedEntries.map((entry, index) => (
+                {entriesToDisplay.map((entry, index) => (
                   <ClassRow
-                    key={entry.id.toString()}
+                    key={`${entry.id.toString()}-${showMockClasses ? "mock" : "actual"}`}
                     entry={entry}
                     index={index}
                     isToday={isTodaySelected}
