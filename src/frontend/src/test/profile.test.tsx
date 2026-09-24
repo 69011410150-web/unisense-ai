@@ -61,6 +61,7 @@ function withActor(actor: MockActor) {
 describe("Profile", () => {
   beforeEach(() => {
     useActorMock.mockReset();
+    window.localStorage.clear();
     withActor(createMockActor());
   });
 
@@ -75,6 +76,41 @@ describe("Profile", () => {
     ).toBeInTheDocument();
     expect(screen.getByText(DEMO_PROFILE.faculty)).toBeInTheDocument();
     expect(screen.getByText("ชั้นปีที่ 1")).toBeInTheDocument();
+  });
+
+  it("selects a profile photo and saves it on this device", async () => {
+    const user = userEvent.setup();
+    renderProfile();
+
+    const input = await screen.findByLabelText("เลือกรูปโปรไฟล์");
+    const file = new File(["demo-image"], "profile.png", {
+      type: "image/png",
+    });
+    await user.upload(input, file);
+
+    const image = await screen.findByRole("img", {
+      name: `รูปโปรไฟล์ของ ${DEMO_PROFILE.displayName}`,
+    });
+    expect(image).toHaveAttribute(
+      "src",
+      expect.stringMatching(/^data:image\/png/),
+    );
+    expect(window.localStorage.getItem("unisense.profile-photo")).toMatch(
+      /^data:image\/png/,
+    );
+    expect(screen.getByLabelText("เปลี่ยนรูปโปรไฟล์")).toBeInTheDocument();
+  });
+
+  it("restores a saved profile photo from this device", async () => {
+    const savedPhoto = "data:image/png;base64,c2F2ZWQ=";
+    window.localStorage.setItem("unisense.profile-photo", savedPhoto);
+    renderProfile();
+
+    expect(
+      await screen.findByRole("img", {
+        name: `รูปโปรไฟล์ของ ${DEMO_PROFILE.displayName}`,
+      }),
+    ).toHaveAttribute("src", savedPhoto);
   });
 
   it("shows today's class summary and the usual campus route", async () => {
@@ -99,6 +135,16 @@ describe("Profile", () => {
     expect(notice).toHaveTextContent("ข้อมูลจำลอง");
     expect(notice).toHaveTextContent("ไม่มีข้อมูลส่วนบุคคลของนักศึกษาจริง");
     expect(notice).toHaveTextContent("ไม่มีการติดตามตำแหน่ง GPS จริง");
+  });
+
+  it("shows campus places associated with the demo profile", async () => {
+    renderProfile();
+
+    expect(await screen.findByText("สถานที่ที่เกี่ยวข้อง")).toBeInTheDocument();
+    expect(screen.getByText("ห้อง SC-204")).toBeInTheDocument();
+    expect(screen.getByText("อาคารหอสมุดกลาง")).toBeInTheDocument();
+    expect(screen.getByText("โรงอาหารกลาง")).toBeInTheDocument();
+    expect(screen.getByText(/ไม่มีการบันทึกหรือติดตามตำแหน่งจริง/)).toBeInTheDocument();
   });
 
   it("toggles preferences and updates the active count", async () => {

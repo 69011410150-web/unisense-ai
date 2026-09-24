@@ -15,20 +15,27 @@ import { Link } from "@tanstack/react-router";
 import {
   BadgeCheck,
   Bell,
+  BookOpen,
   Bus,
   CalendarDays,
+  Camera,
   Compass,
   GraduationCap,
   Info,
   Languages,
+  Library,
   type LucideIcon,
   MapPin,
   Route,
   ShieldCheck,
   Sparkles,
   UserRound,
+  Utensils,
 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { type ChangeEvent, useEffect, useMemo, useState } from "react";
+
+const PROFILE_PHOTO_STORAGE_KEY = "unisense.profile-photo";
+const MAX_PROFILE_PHOTO_BYTES = 2 * 1024 * 1024;
 
 /** The student's usual campus commute, shown as a demo summary. */
 const USUAL_ROUTE = {
@@ -38,6 +45,33 @@ const USUAL_ROUTE = {
   walkMinutes: 7,
   evMinutes: 6,
 };
+
+/** Campus places associated with this fictional student's demo routine. */
+const RELATED_PLACES = [
+  {
+    name: "ห้อง SC-204",
+    detail: "อาคารวิทยาศาสตร์ 2 · ชั้น 2",
+    context: "ห้องเรียนประจำ",
+    icon: BookOpen,
+  },
+  {
+    name: "อาคารหอสมุดกลาง",
+    detail: "ห้องอ่านหนังสือเงียบ LB-110",
+    context: "อ่านหนังสือ",
+    icon: Library,
+  },
+  {
+    name: "โรงอาหารกลาง",
+    detail: "ใกล้ป้ายรถ EV สาย 2",
+    context: "จุดพักระหว่างคลาส",
+    icon: Utensils,
+  },
+] satisfies Array<{
+  name: string;
+  detail: string;
+  context: string;
+  icon: LucideIcon;
+}>;
 
 interface Preference {
   key: string;
@@ -108,6 +142,48 @@ function SectionHeading({
 
 function ProfileHeader() {
   const { data: profile, isLoading } = useProfile();
+  const [photo, setPhoto] = useState<string | null>(null);
+  const [photoError, setPhotoError] = useState("");
+
+  useEffect(() => {
+    try {
+      setPhoto(window.localStorage.getItem(PROFILE_PHOTO_STORAGE_KEY));
+    } catch {
+      setPhotoError("ไม่สามารถอ่านรูปที่บันทึกไว้ในเครื่องได้");
+    }
+  }, []);
+
+  function handlePhotoChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setPhotoError("กรุณาเลือกไฟล์รูปภาพเท่านั้น");
+      return;
+    }
+    if (file.size > MAX_PROFILE_PHOTO_BYTES) {
+      setPhotoError("รูปต้องมีขนาดไม่เกิน 2 MB");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result !== "string") {
+        setPhotoError("ไม่สามารถอ่านรูปนี้ได้ กรุณาลองรูปอื่น");
+        return;
+      }
+      try {
+        window.localStorage.setItem(PROFILE_PHOTO_STORAGE_KEY, reader.result);
+        setPhoto(reader.result);
+        setPhotoError("");
+      } catch {
+        setPhotoError("พื้นที่จัดเก็บในเครื่องไม่เพียงพอ กรุณาเลือกรูปที่เล็กลง");
+      }
+    };
+    reader.onerror = () => setPhotoError("ไม่สามารถอ่านรูปนี้ได้ กรุณาลองรูปอื่น");
+    reader.readAsDataURL(file);
+  }
 
   if (isLoading) {
     return (
@@ -147,14 +223,45 @@ function ProfileHeader() {
       </div>
 
       <div className="px-5 pb-5">
-        <div className="-mt-9 flex items-end gap-4">
-          <span
-            data-ocid="profile.avatar"
-            aria-hidden="true"
-            className="grid size-16 shrink-0 place-items-center rounded-2xl border-4 border-card bg-secondary font-display text-2xl font-bold text-primary shadow-soft"
-          >
-            {initial}
-          </span>
+        <div className="-mt-10 flex items-end gap-4">
+          <div className="relative shrink-0">
+            <span
+              data-ocid="profile.avatar"
+              className="grid size-20 overflow-hidden rounded-full border-4 border-card bg-secondary font-display text-2xl font-bold text-primary shadow-elevated"
+            >
+              {photo ? (
+                <img
+                  src={photo}
+                  alt={`รูปโปรไฟล์ของ ${displayName}`}
+                  className="size-full object-cover"
+                />
+              ) : (
+                <span
+                  aria-hidden="true"
+                  className="grid size-full place-items-center"
+                >
+                  {initial}
+                </span>
+              )}
+            </span>
+            <label
+              htmlFor="profile-photo-input"
+              data-ocid="profile.photo.upload_button"
+              className="absolute -bottom-1 -right-1 grid size-9 cursor-pointer place-items-center rounded-full border-[3px] border-card bg-primary text-primary-foreground shadow-soft transition-snappy hover:scale-105 hover:shadow-elevated focus-within:ring-2 focus-within:ring-ring/40"
+              aria-label={photo ? "เปลี่ยนรูปโปรไฟล์" : "เลือกรูปโปรไฟล์"}
+              title={photo ? "เปลี่ยนรูปโปรไฟล์" : "เลือกรูปโปรไฟล์"}
+            >
+              <Camera className="size-4" aria-hidden="true" />
+              <input
+                id="profile-photo-input"
+                data-ocid="profile.photo.upload_input"
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                onChange={handlePhotoChange}
+              />
+            </label>
+          </div>
           <div className="min-w-0 flex-1 pb-1">
             <h1 className="truncate text-lg font-bold tracking-tight text-foreground">
               {displayName}
@@ -162,8 +269,21 @@ function ProfileHeader() {
             <p className="nums-tabular truncate text-xs font-medium text-muted-foreground">
               รหัสนักศึกษา {profile?.studentId ?? "—"}
             </p>
+            <p className="mt-1 text-[11px] text-muted-foreground">
+              แตะไอคอนกล้องเพื่อ{photo ? "เปลี่ยนรูป" : "เลือกรูป"}
+            </p>
           </div>
         </div>
+
+        {photoError && (
+          <p
+            data-ocid="profile.photo.error_state"
+            role="alert"
+            className="mt-3 rounded-xl bg-destructive/10 px-3 py-2 text-xs font-semibold text-destructive"
+          >
+            {photoError}
+          </p>
+        )}
 
         <dl className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
           <div className="flex items-center gap-2.5 rounded-xl bg-secondary px-3.5 py-2.5">
@@ -398,6 +518,48 @@ function UsualRoute() {
   );
 }
 
+function RelatedPlaces() {
+  return (
+    <section data-ocid="profile.places.section">
+      <SectionHeading title="สถานที่ที่เกี่ยวข้อง" icon={MapPin} />
+
+      <div className="grid gap-3 sm:grid-cols-3">
+        {RELATED_PLACES.map((place, index) => {
+          const Icon = place.icon;
+          return (
+            <Card
+              key={place.name}
+              data-ocid={`profile.places.item.${index + 1}`}
+              className="group relative overflow-hidden rounded-2xl border-border p-4 shadow-soft transition-snappy hover:-translate-y-0.5 hover:border-primary/25 hover:shadow-elevated"
+            >
+              <div className="absolute inset-y-0 left-0 w-1 bg-primary/70" />
+              <div className="flex items-start gap-3 sm:block">
+                <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary transition-snappy group-hover:bg-primary group-hover:text-primary-foreground">
+                  <Icon className="size-[18px]" aria-hidden="true" />
+                </span>
+                <div className="min-w-0 sm:mt-4">
+                  <p className="text-[11px] font-bold text-primary">
+                    {place.context}
+                  </p>
+                  <h3 className="mt-0.5 truncate text-sm font-bold text-foreground">
+                    {place.name}
+                  </h3>
+                  <p className="mt-0.5 truncate text-xs text-muted-foreground">
+                    {place.detail}
+                  </p>
+                </div>
+              </div>
+            </Card>
+          );
+        })}
+      </div>
+      <p className="mt-2 px-1 text-[11px] text-muted-foreground">
+        สถานที่เป็นข้อมูลประกอบสถานการณ์จำลอง ไม่มีการบันทึกหรือติดตามตำแหน่งจริง
+      </p>
+    </section>
+  );
+}
+
 function Preferences() {
   const [values, setValues] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(PREFERENCES.map((item) => [item.key, item.defaultOn])),
@@ -529,6 +691,7 @@ export function Profile() {
     <div data-ocid="profile.page" className="space-y-6">
       <ProfileHeader />
       <TodaySummary />
+      <RelatedPlaces />
       <UsualRoute />
       <Preferences />
       <PrototypeNotice />
