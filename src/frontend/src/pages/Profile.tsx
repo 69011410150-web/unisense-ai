@@ -12,6 +12,7 @@ import {
 } from "@/lib/datetime";
 import type { ClassEntry } from "@/types";
 import { Link } from "@tanstack/react-router";
+import type { LucideIcon } from "lucide-react";
 import {
   BadgeCheck,
   Bell,
@@ -24,7 +25,6 @@ import {
   Info,
   Languages,
   Library,
-  type LucideIcon,
   MapPin,
   Route,
   ShieldCheck,
@@ -32,6 +32,7 @@ import {
   UserRound,
   Utensils,
 } from "lucide-react";
+
 import { type ChangeEvent, useEffect, useMemo, useState } from "react";
 
 const PROFILE_PHOTO_STORAGE_KEY = "unisense.profile-photo";
